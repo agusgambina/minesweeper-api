@@ -2,9 +2,9 @@ package models
 
 case class Game(
   player: String,
-  gameProperties: GameProperties,
-  board: Board,
-  moves: List[Board]
+  gameProperties: GameStatus = GameStatus(),
+  board: Board = Board(cells = List()).createGameBoard(),
+  moves: List[Board] = List()
 )
 
 object Game {

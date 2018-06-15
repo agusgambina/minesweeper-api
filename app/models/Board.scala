@@ -3,35 +3,35 @@ package models
 import scala.util.Random
 
 case class Board(
+  columns: Int = 10,
+  rows: Int = 10,
+  mines: Int = 10,
   cells: List[Cell]
 ) {
 
-  def createGameBoard(columns: Int, rows: Int, mines: Int): Board = copy(cells = createBoardWithMines(columns, rows, mines))
+  def createGameBoard(): Board = copy(cells = createBoardWithMines())
 
-  def createCleanBoard(columns: Int, rows: Int): Board = copy(cells = createWhiteBoard(columns, rows))
+  def createCleanBoard(): Board = copy(cells = createWhiteBoard())
 
-  private def createWhiteBoard(columns: Int, rows: Int): List[Cell] = {
-    for {
+  private def createWhiteBoard(): List[Cell] = {
+    (for {
       col <- 1 to columns
       row <- 1 to rows
-    } yield Cell(Position(col, row))
+    } yield Cell(Position(col, row))).toList
   }
 
-  private def createBoardWithMines(columns: Int, rows: Int, mines: Int): List[Cell] = {
-    val mines = minesPositions(columns, rows, mines)
-    for {
-      col <- 1 to columns
-      row <- 1 to rows
-      isMine <- mines contains Position(col, row)
-    } yield Cell(Position(col, row), isMine)
-  }
-
-  private def minesPositions(columns: Int, rows: Int, mines: Int): List[Position] = {
-    Random.shuffle((for {
+  private def createBoardWithMines(): List[Cell] = {
+    val minesPositions = Random.shuffle((for {
       col <- 1 to columns
       row <- 1 to rows
     } yield Position(col, row)).toList).take(mines)
+    (for {
+      col <- 1 to columns
+      row <- 1 to rows
+      isMine = minesPositions contains Position(col, row)
+    } yield Cell(Position(col, row), isMine)).toList
   }
+
 }
 
 object Board {
