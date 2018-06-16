@@ -1,10 +1,17 @@
 package models
 
+import scala.util.Random
+
 case class Game(
   player: String,
-  gameProperties: GameStatus = GameStatus(),
-  board: Board = Board(cells = List()).createGameBoard(),
-  moves: List[Board] = List()
+  columns: Int = 10,
+  rows: Int = 10,
+  mines: Int = 10,
+  isOver: Boolean = false,
+  isWinner: Boolean = false,
+  timer: Int = 0,
+  gameBoard: Board,
+  moves: List[Board]
 )
 
 object Game {
