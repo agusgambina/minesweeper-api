@@ -18,8 +18,9 @@ object Board {
     (for {
       col <- 1 to columns
       row <- 1 to rows
-      isMine = minesPositions contains Position(col, row)
-    } yield Cell(Position(col, row), isMine)).toList
+    } yield {
+      Cell(Position(col, row), isMine = (minesPositions contains Position(col, row)))
+    }).toList
   })
 
   def createWhiteBoard(columns: Int, rows: Int): Board = Board({
