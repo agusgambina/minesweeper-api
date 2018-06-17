@@ -1,8 +1,7 @@
 package models
 
-import scala.util.Random
-
 case class Game(
+  id: Int,
   player: String,
   columns: Int,
   rows: Int,
