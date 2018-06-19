@@ -9,6 +9,9 @@ GET     /                           controllers.HomeController.index
 # Game
 POST    /game                       controllers.GamesController.createGame()
 
+# Move
+POST    /move                       controllers.GamesController.move()
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 

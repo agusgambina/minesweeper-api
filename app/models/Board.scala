@@ -4,7 +4,11 @@ import scala.util.Random
 
 case class Board(
   cells: List[Cell]
-)
+) {
+  def getCell(position: Position): Cell = {
+    cells.filter(cell => cell.position == position)
+  }
+}
 
 object Board {
   import play.api.libs.json._

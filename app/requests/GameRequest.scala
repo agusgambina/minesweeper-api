@@ -1,13 +1,13 @@
 package requests
 
-case class NewGame(
+case class GameRequest(
   player: String,
   columns: Option[Int],
   rows: Option[Int],
   mines: Option[Int]
 )
 
-object NewGame {
+object GameRequest {
   import play.api.libs.json._
-  implicit val newGameFormat = Json.format[NewGame]
+  implicit val gameRequestFormat = Json.format[GameRequest]
 }

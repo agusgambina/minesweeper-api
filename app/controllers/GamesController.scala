@@ -1,40 +1,34 @@
 package controllers
 
 import javax.inject.Inject
-import models.{Board, Game}
-import play.api.libs.json.Json
+import models.{Game}
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import requests.NewGame
-import services.GameService
+import requests.{GameRequest, MoveRequest}
 
 class GamesController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
-  val defaultColumns = 10
-  val defaultRows = 10
-  val defaultMines = 10
-
   def createGame: Action[AnyContent] = Action { implicit request =>
-    val json = request.body.asJson.get
-    val newGame = json.as[NewGame]
-
-    val savedGame = GameService.newGame(Game(
-      id = GameService.getNextId,
-      player = newGame.player,
-      columns = defaultColumns,
-      rows = defaultRows,
-      mines = defaultMines,
-      gameBoard = Board.createGameBoard(newGame.columns.getOrElse(defaultColumns), newGame.rows.getOrElse(defaultRows), newGame.mines.getOrElse(defaultMines)),
-      moves = List(Board.createWhiteBoard(newGame.columns.getOrElse(defaultColumns), newGame.rows.getOrElse(defaultRows)))
-    ))
-
-    savedGame.fold(
-      error => BadRequest(error),
-      success => Ok(Json.toJson(success))
-    )
-
+    request.body.asJson.get match {
+      case s: JsSuccess[GameRequest] => {
+        Game.newGame(s.get).fold(
+          error => BadRequest(s"Something went wrong: ${error}"),
+          success => Ok(Json.toJson(success))
+        )
+      }
+      case e: JsError => BadRequest("Errors: " + JsError.toJson(e).toString())
+    }
   }
 
-  def newMove: Action[AnyContent] = Action { implicit request =>
-    Ok("")
+  def move: Action[AnyContent] = Action { implicit request =>
+    request.body.asJson.get match {
+      case jsMove: JsSuccess[MoveRequest] => {
+        Game.move(jsMove.get).fold(
+          error => BadRequest(s"Something went wrong: ${error}"),
+          success => Ok(Json.toJson(success))
+        )
+      }
+      case e: JsError => BadRequest("Errors: " + JsError.toJson(e).toString())
+    }
   }
 }
