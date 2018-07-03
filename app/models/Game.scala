@@ -1,8 +1,11 @@
 package models
 
 import models.Game.newGame
+import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 import repositories.GameRepository
 import requests.{GameRequest, MoveRequest}
+
+import scala.concurrent.Future
 
 case class Game(
   id: Int,
@@ -25,12 +28,17 @@ object Game {
   import play.api.libs.json._
   implicit val gameFormat = Json.format[Game]
 
+  implicit val userReader: BSONDocumentReader[Game] = Macros.reader[Game]
+  implicit val userWriter: BSONDocumentWriter[Game] = Macros.writer[Game]
+
   val defaultColumns = 10
   val defaultRows = 10
   val defaultMines = 10
 
+  val gameRepository = new GameRepository()
+
   def newGame(gameRequest: GameRequest): Either[String, Game] = {
-    GameRepository.saveGame(Game(
+    gameRepository.save(Game(
       id = getNextId,
       player = gameRequest.player,
       columns = defaultColumns,
@@ -57,9 +65,11 @@ object Game {
 
   private def reveal(moveRequest: MoveRequest): Either[String, Game] = ???
 
-  private def findGame(gameId: Int): Either[String, Game] = GameRepository.findGame(gameId)
+  private def findGame(gameId: Int): Future[Either[String, Game]] = gameRepository.findGame(gameId)
 
-  private def getNextId: Int = GameRepository.store.length + 1
+  // TODO this would change when persistence is implemented
+  val r = scala.util.Random
+  private def getNextId: Int = r.nextInt
 
   private def isValidPosition(position: Position, game: Game): Boolean =
     0 >= position.column && position.column <= game.columns && 0 >= position.row && position.row <= game.rows

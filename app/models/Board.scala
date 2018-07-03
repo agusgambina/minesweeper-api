@@ -6,7 +6,7 @@ case class Board(
   cells: List[Cell]
 ) {
   def getCell(position: Position): Cell = {
-    cells.filter(cell => cell.position == position)
+    cells.find(cell => cell.position == position).get
   }
 }
 

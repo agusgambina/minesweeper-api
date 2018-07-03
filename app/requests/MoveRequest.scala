@@ -9,6 +9,6 @@ case class MoveRequest(
 
 object MoveRequest {
   import play.api.libs.json._
-  implicit val moveFormat = Json.format[Move]
+  implicit val moveRequestFormat = Json.format[MoveRequest]
 }
 
