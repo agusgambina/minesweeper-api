@@ -1,7 +1,5 @@
 package models
 
-import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
-
 case class Game(
   id: Int,
   player: String,
@@ -22,7 +20,4 @@ case class Game(
 object Game {
   import play.api.libs.json._
   implicit val gameFormat = Json.format[Game]
-
-  implicit val gameReader: BSONDocumentReader[Game] = Macros.reader[Game]
-  implicit val gameWriter: BSONDocumentWriter[Game] = Macros.writer[Game]
 }

@@ -1,38 +1,42 @@
 package repositories
 
 import models.Game
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
+import org.mongodb.scala.bson.ObjectId
+import org.mongodb.scala._
 import play.api.libs.json.Json
-import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
 
-class GameRepository(val reactiveMongoApi: ReactiveMongoApi) {
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
-  def games = reactiveMongoApi.database.map(_.collection[JSONCollection]("games"))
+import scala.concurrent.{ExecutionContext, Future}
+
+class GameRepository(collection: MongoCollection[Game])(implicit ec: ExecutionContext) {
 
   implicit lazy val format = Json.format[Game]
 
-  def save(game: Game): Either[String, Game] = ???
-//  {
-//    games.flatMap(_.insert(game)).flatMap {
-//      _ => Future.successful(game)
-//    } map {
-//      game => Right(game)
-//    } recover {
-//      case error => Left("An error has occurred: " + error.getMessage)
-//    }
-//  }
+  def save(game: Game): Either[String, Game] = {
+    Await.result(collection
+      .insertOne(game)
+      .head
+      .map { _ => game.id.toHexString }.flatMap {
+      _ => Future.successful(game)
+    } map {
+      game => Right(game)
+    } recover {
+      case error => Left("An error has occurred: " + error.getMessage)
+    }, 10 seconds)
+  }
 
   def find(gameId: Int): Either[String, Game] = ???
 //  {
-//    Await(games.flatMap(_.find(Json.obj("gameId" -> gameId)).one[Game]), 10 seconds) match {
+//    Await.result(collection
+//      .find(Document("id" -> new ObjectId(gameId)))
+//      .first
+//      .head
+//      .map(Option(_)) map {
 //      case Some(game: Game) => Right(game)
-//      case error => Left(s"An error has occurred find gameId #${gameId}, ${error}")
-//    }
+//      case _ => Left("An error has occurred")
+//    }, 10 seconds)
 //  }
 
 }

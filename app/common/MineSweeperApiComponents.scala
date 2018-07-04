@@ -6,21 +6,19 @@ import play.api.ApplicationLoader.Context
 import play.api.BuiltInComponentsFromContext
 import play.api.routing.Router
 import play.filters.HttpFiltersComponents
-import play.modules.reactivemongo.{DefaultReactiveMongoApi, ReactiveMongoApi}
-import reactivemongo.api.MongoConnection
 import repositories.GameRepository
 import router.Routes
 import services.GameService
 
 class MineSweeperApiComponents(context: Context)
   extends BuiltInComponentsFromContext(context)
-    with HttpFiltersComponents
-    with AssetsComponents {
+  with MongoModule
+  with HttpFiltersComponents {
 
-  // DB
-  val driver = new reactivemongo.api.MongoDriver
-  val connection: MongoConnection = driver.connection(List("localhost"))
-  lazy val reactiveMongoApi: ReactiveMongoApi = wire[DefaultReactiveMongoApi]
+  // Router
+  lazy val prefix: String = "/"
+  lazy val mineSweeperApiRouter: Router = wire[Routes]
+  lazy val router: Router = mineSweeperApiRouter
 
   // Repos
   lazy val gameRepository = wire[GameRepository]
@@ -31,10 +29,8 @@ class MineSweeperApiComponents(context: Context)
   // Controller
   lazy val gameController = wire[GamesController]
 
-  // Router
-  override lazy val assets = wire[Assets]
-  lazy val prefix: String = "/"
-  lazy val mineSweeperApiRouter: Router = wire[Routes]
-  lazy val router: Router = mineSweeperApiRouter
+}
 
+trait MongoModule {
+  lazy val gamesCollection= Mongo.gameCollection
 }
