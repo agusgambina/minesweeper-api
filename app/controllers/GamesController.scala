@@ -1,17 +1,17 @@
 package controllers
 
-import javax.inject.Inject
-import models.{Game}
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import requests.{GameRequest, MoveRequest}
+import services.GameService
 
-class GamesController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class GamesController(val controllerComponents: ControllerComponents,
+  gameService: GameService) extends BaseController {
 
   def createGame: Action[AnyContent] = Action { implicit request =>
     request.body.asJson.get match {
       case s: JsSuccess[GameRequest] => {
-        Game.newGame(s.get).fold(
+        gameService.newGame(s.get).fold(
           error => BadRequest(s"Something went wrong: ${error}"),
           success => Ok(Json.toJson(success))
         )
@@ -23,7 +23,7 @@ class GamesController @Inject()(cc: ControllerComponents) extends AbstractContro
   def move: Action[AnyContent] = Action { implicit request =>
     request.body.asJson.get match {
       case jsMove: JsSuccess[MoveRequest] => {
-        Game.move(jsMove.get).fold(
+        gameService.move(jsMove.get).fold(
           error => BadRequest(s"Something went wrong: ${error}"),
           success => Ok(Json.toJson(success))
         )

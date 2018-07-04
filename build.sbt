@@ -7,14 +7,16 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.6"
 
+scalacOptions in (Compile,doc) ++= Seq("-Ymacro-expand:none")
+
 libraryDependencies  ++= Seq(
-  guice,
+  jdbc,
+  evolutions,
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.13.0-play26",
+  "com.github.nscala-time" %% "nscala-time" % "2.18.0",
+  "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.13.0-play26"
+  "org.scalamock" %% "scalamock" % "4.1.0" % Test,
+  "org.mockito" % "mockito-core" % "2.7.19" % Test
 )
 
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.agusgambina.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.agusgambina.binders._"

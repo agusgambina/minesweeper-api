@@ -2,6 +2,8 @@ package models
 
 import scala.util.Random
 
+import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
+
 case class Board(
   cells: List[Cell]
 ) {
@@ -13,6 +15,9 @@ case class Board(
 object Board {
   import play.api.libs.json._
   implicit val boardFormat = Json.format[Board]
+
+  implicit val boardReader: BSONDocumentReader[Board] = Macros.reader[Board]
+  implicit val boardWriter: BSONDocumentWriter[Board] = Macros.writer[Board]
 
   def createGameBoard(columns: Int, rows: Int, mines: Int): Board = Board({
     val minesPositions = Random.shuffle((for {
